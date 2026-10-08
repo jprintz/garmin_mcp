@@ -1,5 +1,12 @@
 [![MseeP.ai Security Assessment Badge](https://mseep.net/pr/taxuspt-garmin-mcp-badge.png)](https://mseep.ai/app/taxuspt-garmin-mcp)
 
+> **This fork** ([jprintz/garmin_mcp](https://github.com/jprintz/garmin_mcp)) adds
+> complete MCP tool annotations: every tool gets a title and read-only /
+> destructive / idempotent / open-world hints, derived from its verb in
+> [`annotations.py`](src/garmin_mcp/annotations.py). A unit test fails when a new
+> tool's verb has no rule. Otherwise it tracks upstream.
+
+
 # Garmin MCP Server
 
 This Model Context Protocol (MCP) server connects to Garmin Connect and exposes your fitness and health data to Claude and other MCP-compatible clients.

@@ -14,6 +14,7 @@ from garminconnect import Garmin, GarminConnectAuthenticationError, GarminConnec
 
 # Import all modules
 from garmin_mcp import token_utils
+from garmin_mcp.annotations import annotations_for
 from garmin_mcp import activity_management
 from garmin_mcp import health_wellness
 from garmin_mcp import user_profile
@@ -376,7 +377,6 @@ class _ToolFilter:
         # size for clients that forward both blocks (issue #331). Opt out
         # globally; callers can still pass structured_output=True explicitly.
         kwargs.setdefault("structured_output", False)
-        decorator = self._app.tool(*args, **kwargs)
         # Prefer the explicit registered name if given (@app.tool(name="x")),
         # so the env-var filter matches what the user actually configures.
         explicit = kwargs.get("name") or (
@@ -386,9 +386,14 @@ class _ToolFilter:
         def wrapper(fn):
             name = explicit or getattr(fn, "__name__", "")
             self._seen.add(name.lower())
-            if self._allowed(name):
-                return decorator(fn)
-            return fn  # skip registration; tool never reaches the LLM
+            if not self._allowed(name):
+                return fn  # skip registration; tool never reaches the LLM
+            # Every tool gets MCP annotations (title, read-only/destructive/
+            # idempotent/open-world hints) derived from its name, unless the
+            # module passed its own. See annotations.py.
+            tool_kwargs = dict(kwargs)
+            tool_kwargs.setdefault("annotations", annotations_for(name))
+            return self._app.tool(*args, **tool_kwargs)(fn)
 
         return wrapper
 

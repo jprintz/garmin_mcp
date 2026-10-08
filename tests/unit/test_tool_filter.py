@@ -125,7 +125,8 @@ def test_structured_output_defaults_to_false():
     app = FakeApp()
     filt = _ToolFilter(app, set(), set())
     _register(filt, ["get_a"])
-    assert app.tool_kwargs == [{"structured_output": False}]
+    assert len(app.tool_kwargs) == 1
+    assert app.tool_kwargs[0]["structured_output"] is False
 
 
 def test_structured_output_explicit_true_is_preserved():
@@ -137,4 +138,5 @@ def test_structured_output_explicit_true_is_preserved():
 
     fn.__name__ = "get_a"
     filt.tool(structured_output=True)(fn)
-    assert app.tool_kwargs == [{"structured_output": True}]
+    assert len(app.tool_kwargs) == 1
+    assert app.tool_kwargs[0]["structured_output"] is True
